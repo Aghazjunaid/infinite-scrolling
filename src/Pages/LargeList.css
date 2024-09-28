@@ -1,23 +1,6 @@
-.scroll-container {
-    height: 100vh;
-    width: 100%;
-    overflow-y: auto;
-    padding: 10px;
-    transition: all 0.3s ease-in-out;
-  }
-  
-  .scroll-item {
-    animation: fadeIn 0.5s;
-    border: '1px solid #ddd';
-    padding: '10px'; 
-    transition: all 0.3s ease-in-out;
-    margin: 20px;
-    box-shadow: 2px 2px 2px 2px; 
-  }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+  .img-item{
+    width: 50%;
+    object-fit: contain;
   }
   
   .loading {
@@ -30,10 +13,4 @@
     0% { opacity: 0.2; }
     50% { opacity: 1; }
     100% { opacity: 0.2; }
-  }
-
-  @media (max-width: 600px) {
-    .scroll-item {
-      box-shadow: none;
-    }
   }
