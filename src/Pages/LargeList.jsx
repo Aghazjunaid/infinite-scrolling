@@ -1,76 +1,50 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './LargeList.css';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import ListItem from '../Component/ListItem';
+import './LargeList.css';
 
-const LargeList = () => {
+const InfiniteScrollList = () => {
     const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    fetchData();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const fetchData = () => {
-    setLoading(true);
-    setError(null);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
   
-    // Wrap setTimeout in a Promise
-    new Promise((resolve, reject) => {
-      setTimeout(() => {
-        try {
-          const newItems = Array.from({ length: 10 }, (_, index) => `https://picsum.photos/200/300?random=${index+1}`);
-          setItems(prevItems => [...prevItems, ...newItems]);
-          setLoading(false);
-          resolve();
-        } catch (error) {
-          reject(error);
-        }
-      }, 1000);
-    })
-    .catch(error => {
-      setError('Failed to fetch data');
+    const fetchMoreItems = async () => {
+      setLoading(true);
+      const response = await axios.get(`https://picsum.photos/v2/list?page=${page}&limit=10`);
+      setItems(prevItems => [...prevItems, ...response.data]);
+      setPage(prevPage => prevPage + 1);
       setLoading(false);
-    });
-  };
-
-  const handleResize = () => {
-    // Trigger a re-render when the window size changes
-    setItems([...items]);
-  };
-
-    const debounce = (func, delay) => {
-        let timer;
-        return function () {
-            const context = this;
-            const args = arguments;
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(context, args), delay);
-        };
     };
 
+  useEffect(() => {
+    fetchMoreItems();
+  }, []);
+
+  useEffect(() => {
     const handleScroll = debounce(() => {
-        const { scrollTop, clientHeight, scrollHeight } = containerRef.current;
+        if (window.innerHeight + document.documentElement.scrollTop < document.documentElement.offsetHeight - 50) return;
+        fetchMoreItems();
+      }, 300);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-        if (scrollHeight - scrollTop === clientHeight && !loading) {
-            fetchData();
-        }
-    }, 200); // Adjust debounce delay as needed
-
-    return (
-        <div
-          ref={containerRef}
-          className="scroll-container"
-          onScroll={handleScroll}
-        >
-          {/* {items.map(renderItem)} */}
-          <ListItem items={items}/>
-          {loading && <div className="loading">Loading...</div>}
-        </div>
-    );
+  const debounce = (func, delay) => {
+    let timer;
+    return function () {
+        const context = this;
+        const args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(context, args), delay);
+    };
 };
 
-export default LargeList;
+  return (
+    <div>
+        <ListItem items={items}/>
+        {loading && <div className="loading">Loading...</div>}
+    </div>
+  );
+};
+
+export default InfiniteScrollList;
