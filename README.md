@@ -4,7 +4,7 @@
 
 This Project is a Simple ReactJS Project which demonstrates the following
 1. Creating a Component in React
-2. Getting random image from here https://picsum.photos/200/300
+2. Making HTTP calls using axios with pagination
 3. Communicating between parent and child component
 4. Preventing rapid scrolling using debouncing
 5. Effect cleanup to reduce memory leaks
